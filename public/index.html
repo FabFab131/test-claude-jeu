@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Survie — jeu de rôle raconté par une IA</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <main id="map-wrap">
+      <div id="map-frame">
+        <canvas id="map"></canvas>
+      </div>
+      <div id="legend">
+        <span><i class="lg you"></i> Vous</span>
+        <span><i class="lg fam"></i> Proches</span>
+        <span>🚧 Obstacle</span>
+        <span><i class="lg zone"></i> Zone dangereuse</span>
+        <span class="muted">Cliquez sur un lieu pour l’ajouter à votre action</span>
+      </div>
+    </main>
+
+    <aside id="panel">
+      <header>
+        <div>
+          <h1 id="scenario-title">Survie</h1>
+          <div id="clock"></div>
+        </div>
+        <button id="new-game" type="button" title="Nouvelle partie">↻ Nouvelle partie</button>
+      </header>
+
+      <section class="status-grid">
+        <div class="card">
+          <h2>État</h2>
+          <div class="health"><div id="health-bar"></div></div>
+          <div class="row"><span>Santé <b id="health-val">100</b>/100</span></div>
+          <div id="condition" class="sub"></div>
+        </div>
+        <div class="card">
+          <h2>Objectifs</h2>
+          <ul id="objectives"></ul>
+        </div>
+        <div class="card">
+          <h2>Proches</h2>
+          <ul id="family"></ul>
+        </div>
+        <div class="card">
+          <h2>Inventaire</h2>
+          <div id="inventory"></div>
+          <h2 class="mt">Menaces connues</h2>
+          <ul id="threats"></ul>
+        </div>
+      </section>
+
+      <section id="journal" aria-live="polite"></section>
+
+      <div id="thinking" class="hidden"><span class="spinner"></span> Le maître du jeu réfléchit…</div>
+      <div id="suggestions"></div>
+      <form id="action-form">
+        <textarea id="action" rows="3" placeholder="Décrivez votre stratégie… ex : « Ma priorité est de rassembler la famille à la maison, puis j’irai au magasin de bricolage chercher de quoi être autonome. »"></textarea>
+        <button id="send" type="submit">Agir ▶</button>
+      </form>
+    </aside>
+  </div>
+
+  <div id="start-screen" class="overlay hidden">
+    <div class="modal">
+      <h1>🗺️ Survie</h1>
+      <p class="lead">Vous êtes un civil ordinaire face à une catastrophe. Un maître du jeu vous décrit la situation, vous écrivez librement ce que vous faites. Vos choix comptent.</p>
+      <div id="mode-info" class="mode"></div>
+      <h2>Choisissez une situation</h2>
+      <div id="scenario-list"></div>
+    </div>
+  </div>
+
+  <div id="end-screen" class="overlay hidden">
+    <div class="modal small">
+      <h1 id="end-title"></h1>
+      <p id="end-text"></p>
+      <p id="end-stats" class="muted"></p>
+      <div class="actions">
+        <button id="end-close" type="button" class="secondary">Revoir la carte</button>
+        <button id="restart" type="button">Nouvelle partie</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tooltip" class="hidden"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "survie-ia",
+  "version": "0.1.0",
+  "description": "Jeu de rôle de survie vu du ciel, raconté par une IA maître du jeu",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "demo": "GM_MODE=demo node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0"
+  }
+}
