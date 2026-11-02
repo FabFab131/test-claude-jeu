@@ -4,6 +4,7 @@ import { findPath, distanceField } from './pathfinding.js';
 import { Renderer, OBSTACLE_ICONS, ZONE_STYLES } from './render.js';
 import { SCENARIOS, scenarioById } from './scenarios.js';
 import * as ui from './ui.js';
+import * as gm from './gm.js';
 
 const WALK_M_PER_MIN = 80;
 const COMPANION_COLORS = ['#ffb703', '#fb8500', '#c77dff', '#ff006e', '#80ed99'];
@@ -11,6 +12,7 @@ const HISTORY_SENT = 12;
 
 const state = {
   mode: 'demo',
+  available: 'demo',
   model: null,
   scenario: null,
   map: null,
@@ -34,11 +36,9 @@ let rendererStarted = false;
 
 // ---------- Démarrage ----------
 async function init() {
-  try {
-    const st = await fetch('/api/status').then((r) => r.json());
-    state.mode = st.mode; state.model = st.model;
-  } catch { state.mode = 'demo'; }
-  ui.showStart(SCENARIOS, { mode: state.mode, model: state.model }, startGame);
+  const st = await gm.getStatus();
+  state.available = st.mode; state.model = st.model; state.hint = st.hint;
+  openStart();
 
   document.getElementById('action-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -53,8 +53,7 @@ async function init() {
   });
   document.getElementById('new-game').addEventListener('click', () => {
     if (state.busy) return;
-    if (state.status === 'ongoing' && state.turn > 1 && !confirm('Abandonner la partie en cours ?')) return;
-    ui.showStart(SCENARIOS, { mode: state.mode, model: state.model }, startGame);
+    openStart();
   });
 
   canvas.addEventListener('mousemove', (e) => {
@@ -94,8 +93,14 @@ function obstacleAtScreen(e) {
   return state.obstacles.find((o) => Math.hypot(o.x + 0.5 - p.x, o.y + 0.5 - p.y) < 1);
 }
 
-async function startGame(scenarioId) {
+function openStart() {
+  const resumable = !!state.map && state.status === 'ongoing' && state.turn > 0;
+  ui.showStart(SCENARIOS, { mode: state.available, model: state.model, hint: state.hint, resumable }, startGame);
+}
+
+async function startGame(scenarioId, { demo = false } = {}) {
   ui.hideStart();
+  state.mode = state.available === 'ai' && !demo ? 'ai' : 'demo';
   ui.clearJournal();
   ui.renderSuggestions([]);
   const scenario = scenarioById(scenarioId);
@@ -205,10 +210,9 @@ async function playTurn(action) {
   if (action !== '__DEBUT__') ui.addJournal('player', action);
   let res;
   try {
-    const r = await fetch('/api/turn', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(buildContext(action)) });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
-    res = data;
+    res = await gm.requestTurn(buildContext(action));
+    if (res._mode) state.mode = res._mode; // bascule automatique en mode démo
+    if (res._notice) ui.addJournal('error', res._notice);
   } catch (e) {
     ui.addJournal('error', `Le maître du jeu ne répond pas (${e.message}). Réessayez.`);
     if (action !== '__DEBUT__') document.getElementById('action').value = action;
@@ -364,7 +368,7 @@ async function applyTurn(res, action) {
   state.status = ['won', 'lost'].includes(res.game_status) ? res.game_status : 'ongoing';
   if (state.player.health <= 0) state.status = 'lost';
   if (state.status !== 'ongoing') {
-    setTimeout(() => ui.showEnd(state.status, String(res.narration || ''), state.turn, () => ui.showStart(SCENARIOS, { mode: state.mode, model: state.model }, startGame)), 900);
+    setTimeout(() => ui.showEnd(state.status, String(res.narration || ''), state.turn, openStart), 900);
     ui.renderSuggestions([]);
   } else {
     ui.renderSuggestions(arr(res.suggestions).slice(0, 4), (s) => {

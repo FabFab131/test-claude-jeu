@@ -77,6 +77,8 @@ button.secondary { background: var(--card); border: 1px solid var(--border); }
 .modal h1 { margin: 0 0 8px; }
 .modal h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .lead { font-size: 15px; }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.demo-toggle { display: flex; gap: 6px; align-items: center; margin-top: 6px; color: var(--muted); cursor: pointer; }
 .mode { background: var(--card); border-radius: 8px; padding: 8px 12px; font-size: 13px; }
 #scenario-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
 .scenario-card { text-align: left; background: var(--card); border: 1px solid var(--border); color: var(--text); display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 12px; transition: transform .1s, border-color .1s; }
@@ -92,7 +94,8 @@ button.secondary { background: var(--card); border: 1px solid var(--border); }
 
 @media (max-width: 1000px) {
   #app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; min-height: 100vh; }
-  #map-wrap { padding: 8px 16px; }
+  #map-wrap { padding: 8px 16px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); }
+  #legend { display: none; }
   #map { width: 100%; height: auto; }
   #panel { border-left: 0; border-top: 1px solid var(--border); }
   #journal { min-height: 260px; max-height: 50vh; }

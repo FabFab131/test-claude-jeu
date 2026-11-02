@@ -29,6 +29,12 @@ Ouvrez ensuite <http://localhost:3000>.
 Sans clé API, le jeu démarre en **mode démo** : un maître du jeu simplifié, à base de mots-clés, permet de
 tester la boucle de jeu (`npm run demo` force ce mode).
 
+### Version « lien » (sans serveur)
+
+`npm run build:artifact` assemble tout le jeu en un seul fichier `dist/survie.html`, publiable comme page
+claude.ai. Dans cette version, le maître du jeu appelle Claude directement depuis la page, avec le compte
+Claude de la personne qui joue (aucune clé API). Si l'IA n'est pas autorisée, la partie se joue en mode démo.
+
 ### Variables d'environnement
 
 | Variable | Rôle | Défaut |

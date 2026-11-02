@@ -12,23 +12,29 @@ export function showStart(scenarios, status, onStart) {
     const b = document.createElement('button');
     b.className = 'scenario-card';
     b.innerHTML = `<span class="sc-emoji">${s.emoji}</span><span class="sc-name">${esc(s.name)}</span><span class="sc-pitch">${esc(s.pitch)}</span>`;
-    b.onclick = () => onStart(s.id);
+    b.onclick = () => onStart(s.id, { demo: demoChosen() });
     list.appendChild(b);
   }
   const rnd = document.createElement('button');
   rnd.className = 'scenario-card random';
   rnd.innerHTML = '<span class="sc-emoji">🎲</span><span class="sc-name">Aléatoire</span><span class="sc-pitch">Laissez le destin choisir la catastrophe.</span>';
-  rnd.onclick = () => onStart(scenarios[Math.floor(Math.random() * scenarios.length)].id);
+  rnd.onclick = () => onStart(scenarios[Math.floor(Math.random() * scenarios.length)].id, { demo: demoChosen() });
   list.appendChild(rnd);
 
   const m = $('#mode-info');
   if (status.mode === 'ai') {
-    m.innerHTML = `🤖 Maître du jeu : <b>IA</b> <span class="muted">(${esc(status.model)})</span>`;
+    m.innerHTML = `<div>🤖 Maître du jeu : <b>IA Claude</b>${status.model ? ` <span class="muted">(${esc(status.model)})</span>` : ''}</div>`
+      + '<label class="demo-toggle"><input type="checkbox" id="demo-mode"> Jouer en mode démo (règles simples, sans IA)</label>';
   } else {
-    m.innerHTML = '🧩 Maître du jeu : <b>mode démo</b> (règles simples, sans IA). <span class="muted">Définissez <code>ANTHROPIC_API_KEY</code> côté serveur pour activer l’IA.</span>';
+    m.innerHTML = `🧩 Maître du jeu : <b>mode démo</b> (règles simples, sans IA). <span class="muted">${esc(status.hint || 'Définissez ANTHROPIC_API_KEY côté serveur pour activer l’IA.')}</span>`;
   }
+  const resume = $('#resume');
+  resume.classList.toggle('hidden', !status.resumable);
+  resume.onclick = hideStart;
   $('#start-screen').classList.remove('hidden');
 }
+
+function demoChosen() { return !!document.getElementById('demo-mode')?.checked; }
 
 export function hideStart() { $('#start-screen').classList.add('hidden'); }
 

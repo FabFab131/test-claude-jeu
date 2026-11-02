@@ -42,8 +42,9 @@ const server = http.createServer(async (req, res) => {
       const ctx = JSON.parse(await readBody(req));
       if (!ctx || typeof ctx.action !== 'string' || !ctx.state || !ctx.map) return send(res, 400, { error: 'Contexte invalide' });
       const t0 = Date.now();
-      const out = MODE === 'ai' ? await ai.runAiTurn(ctx) : runMockTurn(ctx);
-      console.log(`[tour ${Number(ctx.turn) + 1}] ${MODE} ${Date.now() - t0} ms — ${ctx.action.slice(0, 80)}`);
+      const useAi = MODE === 'ai' && ctx.mode !== 'demo';
+      const out = useAi ? await ai.runAiTurn(ctx) : runMockTurn(ctx);
+      console.log(`[tour ${Number(ctx.turn) + 1}] ${useAi ? 'ai' : 'demo'} ${Date.now() - t0} ms — ${ctx.action.slice(0, 80)}`);
       return send(res, 200, out);
     }
     if (req.method !== 'GET') return send(res, 405, { error: 'Méthode non autorisée' });
